@@ -1,78 +1,74 @@
-'use server'
+"use server";
 
-import { useToast } from '@/hooks/use-toast';
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
-
-export async function login(formData : { email : string ; password : string }) {
-
+export async function login(formData: { email: string; password: string }) {
   const supabase = createClient();
 
   const data = {
     email: formData.email as string,
     password: formData.password as string,
   };
-  
+
   const result = await supabase.auth.signInWithPassword(data);
-  
 
   return JSON.stringify(result);
-
 }
 
-export async function signup(formData: { email : string, password : string , confirmPassword: string }) {
-
+export async function signup(formData: {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}) {
   const supabase = createClient();
 
   const data = {
     email: formData.email as string,
     password: formData.password as string,
   };
-  
-  const result = await supabase.auth.signUp(data)
+
+  const result = await supabase.auth.signUp(data);
 
   return JSON.stringify(result);
-
 }
 
-export async function signOut(){
+export async function signOut() {
+  const supabase = createClient();
 
-    const supabase = createClient();
+  await supabase.auth.signOut();
 
-    await supabase.auth.signOut();
-
-    revalidatePath('/', 'layout')
-    redirect('/')
+  revalidatePath("/", "layout");
+  redirect("/");
 }
 
-export async function getAdmin(){
-
-  const supabase = createClient()
+export async function getAdmin() {
+  const supabase = createClient();
 
   const { data, error } = await supabase.auth.getUser();
 
-  const result = await supabase.from('Roles').select('*').eq('user_id',data?.user?.id).single();
+  const result = await supabase
+    .from("Roles")
+    .select("*")
+    .eq("user_id", data?.user?.id)
+    .single();
 
-  if ( !result.data ) {
+  if (!result.data) {
     return false;
   }
 
   return true;
-
 }
 
-export async function isAuth(){
-
-  const supabase = createClient()
+export async function isAuth() {
+  const supabase = createClient();
 
   const result = await supabase.auth.getUser();
 
-  if ( !result.data ) {
+  if (!result.data) {
     return false;
   }
 
   return true;
-
 }

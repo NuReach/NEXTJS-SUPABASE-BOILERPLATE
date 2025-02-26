@@ -1,12 +1,19 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
-import { Input } from "./ui/input"
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { Input } from "./ui/input";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -15,22 +22,21 @@ import { ToastAction } from "./ui/toast";
 
 const FormSchema = z.object({
   email: z.string().email(),
-  password : z.string().min(8),
-})
+  password: z.string().min(8),
+});
 
 export function SignInForm() {
+  const { toast } = useToast();
 
-  const { toast } = useToast()
-
-  const router = useRouter()
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       email: "",
-      password:""
+      password: "",
     },
-  })
+  });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     const result = await login(data);
@@ -41,12 +47,12 @@ export function SignInForm() {
         title: "Uh oh! Something went wrong.",
         description: "There was a problem with your credential.",
         action: <ToastAction altText="Try again">Try again</ToastAction>,
-      })
-    }else{
+      });
+    } else {
       toast({
         description: "Your Login successfully 😍",
-      })
-      router.push('/');  
+      });
+      router.push("/");
     }
   }
 
@@ -66,7 +72,7 @@ export function SignInForm() {
             </FormItem>
           )}
         />
-         <FormField
+        <FormField
           control={form.control}
           name="password"
           render={({ field }) => (
@@ -80,11 +86,13 @@ export function SignInForm() {
           )}
         />
         <div className="flex space-x-3">
-            <p className="text-xs">Don't have an account?</p>
-            <Link className=" text-xs font-bold" href="/signup">Sing Up</Link>
+          <p className="text-xs">Do not have an account?</p>
+          <Link className=" text-xs font-bold" href="/signup">
+            Sing Up
+          </Link>
         </div>
         <Button type="submit">Login</Button>
       </form>
     </Form>
-  )
+  );
 }
